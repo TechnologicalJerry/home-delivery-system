@@ -1,0 +1,20 @@
+{
+  "name": "@home-delivery/analytics-service",
+  "version": "1.0.0",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "dependencies": {
+    "@home-delivery/shared": "file:../shared",
+    "mongodb": "^6.3.0",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3",
+    "ts-node-dev": "^2.0.0"
+  }
+}
