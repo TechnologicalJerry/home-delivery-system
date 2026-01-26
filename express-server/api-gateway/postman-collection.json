@@ -1,0 +1,410 @@
+{
+  "info": {
+    "name": "API Gateway - Home Delivery System",
+    "description": "API Gateway collection with all service routes",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('token', jsonData.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Refresh Token",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{token}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "refresh"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"phone\": \"+1234567890\",\n  \"address\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products?category=electronics",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products"],
+              "query": [{"key": "category", "value": "electronics"}]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/products/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "products", ":id"],
+              "variable": [{"key": "id", "value": "product-uuid"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "item": [
+        {
+          "name": "Get Inventory",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/inventory/:productId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "inventory", ":productId"],
+              "variable": [{"key": "productId", "value": "product-uuid"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Cart",
+      "item": [
+        {
+          "name": "Get Cart",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart"]
+            }
+          }
+        },
+        {
+          "name": "Add Item to Cart",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product-uuid\",\n  \"quantity\": 2,\n  \"price\": 29.99,\n  \"name\": \"Product Name\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart", "items"]
+            }
+          }
+        },
+        {
+          "name": "Update Cart Item",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 3\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/:itemId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart", "items", ":itemId"],
+              "variable": [{"key": "itemId", "value": "product-uuid"}]
+            }
+          }
+        },
+        {
+          "name": "Remove Item from Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart/items/:itemId",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart", "items", ":itemId"],
+              "variable": [{"key": "itemId", "value": "product-uuid"}]
+            }
+          }
+        },
+        {
+          "name": "Clear Cart",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/cart",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "cart"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"deliveryAddress\": {\n    \"street\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"coordinates\": {\n      \"lat\": 40.7128,\n      \"lng\": -74.0060\n    }\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", ":id"],
+              "variable": [{"key": "id", "value": "order-uuid"}]
+            }
+          }
+        },
+        {
+          "name": "Cancel Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Changed my mind\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/orders/:id/cancel",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "orders", ":id", "cancel"],
+              "variable": [{"key": "id", "value": "order-uuid"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Create Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"},
+              {"key": "Content-Type", "value": "application/json"}
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"order-uuid\",\n  \"amount\": 99.99,\n  \"paymentMethod\": \"credit_card\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/payments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments"]
+            }
+          }
+        },
+        {
+          "name": "Get Payment",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/payments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "payments", ":id"],
+              "variable": [{"key": "id", "value": "payment-uuid"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delivery",
+      "item": [
+        {
+          "name": "Track Delivery",
+          "request": {
+            "method": "GET",
+            "header": [
+              {"key": "Authorization", "value": "Bearer {{token}}"}
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/deliveries/:orderId/track",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "deliveries", ":orderId", "track"],
+              "variable": [{"key": "orderId", "value": "order-uuid"}]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
