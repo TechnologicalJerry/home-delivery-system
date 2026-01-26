@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Analytics Service",
+    "description": "Event-driven analytics service (consumes events, no direct HTTP endpoints)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3010",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Note",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/info",
+          "host": ["{{baseUrl}}"],
+          "path": ["info"]
+        },
+        "description": "This service is event-driven and consumes events from Redis Streams. It processes:\n- Order events (ORDER_CREATED)\n- Payment events (PAYMENT_SUCCESS)\n- Delivery events (DELIVERY_COMPLETED)\n\nAnalytics data is stored in MongoDB automatically when these events occur."
+      }
+    }
+  ]
+}
