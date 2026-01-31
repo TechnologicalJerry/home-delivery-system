@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DELIVERY_DATABASE_URL")
+}
+
+enum DeliveryStatus {
+  PENDING
+  ASSIGNED
+  PICKED_UP
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+model Delivery {
+  id                String        @id @default(uuid())
+  orderId            String        @unique
+  deliveryAgentId   String?
+  status             DeliveryStatus @default(PENDING)
+  pickupLocation     Json
+  deliveryLocation   Json
+  currentLocation    Json?
+  estimatedTime      Int?         // minutes
+  actualTime         Int?
+  createdAt          DateTime      @default(now())
+  updatedAt          DateTime      @updatedAt
+
+  @@index([orderId])
+  @@index([deliveryAgentId])
+  @@index([status])
+  @@map("deliveries")
+}
