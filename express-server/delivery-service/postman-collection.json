@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "Delivery Service",
+    "description": "Delivery tracking service with real-time updates",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3008",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Track Delivery",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "x-user-id", "value": "user-uuid"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/deliveries/:orderId/track",
+          "host": ["{{baseUrl}}"],
+          "path": ["deliveries", ":orderId", "track"],
+          "variable": [{"key": "orderId", "value": "order-uuid"}]
+        }
+      }
+    },
+    {
+      "name": "Update Delivery Location",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"deliveryId\": \"delivery-uuid\",\n  \"lat\": 40.7128,\n  \"lng\": -74.0060\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/deliveries/:deliveryId/location",
+          "host": ["{{baseUrl}}"],
+          "path": ["deliveries", ":deliveryId", "location"],
+          "variable": [{"key": "deliveryId", "value": "delivery-uuid"}]
+        }
+      }
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    }
+  ]
+}
