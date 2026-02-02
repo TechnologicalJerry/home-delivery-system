@@ -1,0 +1,75 @@
+{
+  "info": {
+    "name": "Inventory Service",
+    "description": "Inventory management service",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3004",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Get Inventory",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/inventory/:productId",
+          "host": ["{{baseUrl}}"],
+          "path": ["inventory", ":productId"],
+          "variable": [{"key": "productId", "value": "product-uuid"}]
+        }
+      }
+    },
+    {
+      "name": "Reserve Inventory",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/inventory/:productId/reserve",
+          "host": ["{{baseUrl}}"],
+          "path": ["inventory", ":productId", "reserve"],
+          "variable": [{"key": "productId", "value": "product-uuid"}]
+        }
+      }
+    },
+    {
+      "name": "Release Inventory",
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/json"}],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"quantity\": 2\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/inventory/:productId/release",
+          "host": ["{{baseUrl}}"],
+          "path": ["inventory", ":productId", "release"],
+          "variable": [{"key": "productId", "value": "product-uuid"}]
+        }
+      }
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    }
+  ]
+}
