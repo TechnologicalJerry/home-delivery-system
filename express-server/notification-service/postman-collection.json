@@ -1,0 +1,29 @@
+{
+  "info": {
+    "name": "Notification Service",
+    "description": "Event-driven notification service (consumes events, no direct HTTP endpoints)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3009",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Note",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/info",
+          "host": ["{{baseUrl}}"],
+          "path": ["info"]
+        },
+        "description": "This service is event-driven and consumes events from Redis Streams. It processes:\n- Order events (ORDER_CREATED, ORDER_DELIVERED)\n- Payment events (PAYMENT_SUCCESS, PAYMENT_FAILED)\n- Delivery events (DELIVERY_IN_TRANSIT)\n\nNotifications are sent automatically when these events occur."
+      }
+    }
+  ]
+}
