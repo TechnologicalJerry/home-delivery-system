@@ -1,0 +1,378 @@
+version: '3.8'
+
+services:
+  # Databases
+  postgres-auth:
+    image: postgres:15-alpine
+    container_name: postgres-auth
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-auth-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  postgres-user:
+    image: postgres:15-alpine
+    container_name: postgres-user
+    environment:
+      POSTGRES_DB: user_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres-user-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  postgres-product:
+    image: postgres:15-alpine
+    container_name: postgres-product
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5434:5432"
+    volumes:
+      - postgres-product-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  postgres-inventory:
+    image: postgres:15-alpine
+    container_name: postgres-inventory
+    environment:
+      POSTGRES_DB: inventory_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres-inventory-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  postgres-order:
+    image: postgres:15-alpine
+    container_name: postgres-order
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres-order-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  postgres-payment:
+    image: postgres:15-alpine
+    container_name: postgres-payment
+    environment:
+      POSTGRES_DB: payment_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5437:5432"
+    volumes:
+      - postgres-payment-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  postgres-delivery:
+    image: postgres:15-alpine
+    container_name: postgres-delivery
+    environment:
+      POSTGRES_DB: delivery_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres-delivery-data:/var/lib/postgresql/data
+    networks:
+      - delivery-network
+
+  mongodb-analytics:
+    image: mongo:7
+    container_name: mongodb-analytics
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb-analytics-data:/data/db
+    networks:
+      - delivery-network
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    networks:
+      - delivery-network
+
+  # Kafka
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.5.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - delivery-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.5.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - delivery-network
+
+  # Services (to be built)
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    container_name: api-gateway
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+    depends_on:
+      - redis
+    networks:
+      - delivery-network
+    volumes:
+      - ./api-gateway:/app
+      - /app/node_modules
+
+  auth-service:
+    build:
+      context: .
+      dockerfile: ./auth-service/Dockerfile
+    container_name: auth-service
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+    depends_on:
+      - postgres-auth
+      - redis
+    networks:
+      - delivery-network
+    volumes:
+      - ./auth-service:/app
+      - /app/node_modules
+
+  user-service:
+    build:
+      context: .
+      dockerfile: ./user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - "3002:3002"
+    environment:
+      NODE_ENV: development
+      PORT: 3002
+    depends_on:
+      - postgres-user
+      - redis
+    networks:
+      - delivery-network
+    volumes:
+      - ./user-service:/app
+      - /app/node_modules
+
+  product-service:
+    build:
+      context: .
+      dockerfile: ./product-service/Dockerfile
+    container_name: product-service
+    ports:
+      - "3003:3003"
+    environment:
+      NODE_ENV: development
+      PORT: 3003
+    depends_on:
+      - postgres-product
+      - redis
+    networks:
+      - delivery-network
+    volumes:
+      - ./product-service:/app
+      - /app/node_modules
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: ./inventory-service/Dockerfile
+    container_name: inventory-service
+    ports:
+      - "3004:3004"
+    environment:
+      NODE_ENV: development
+      PORT: 3004
+    depends_on:
+      - postgres-inventory
+      - redis
+      - kafka
+    networks:
+      - delivery-network
+    volumes:
+      - ./inventory-service:/app
+      - /app/node_modules
+
+  cart-service:
+    build:
+      context: .
+      dockerfile: ./cart-service/Dockerfile
+    container_name: cart-service
+    ports:
+      - "3005:3005"
+    environment:
+      NODE_ENV: development
+      PORT: 3005
+    depends_on:
+      - redis
+    networks:
+      - delivery-network
+    volumes:
+      - ./cart-service:/app
+      - /app/node_modules
+
+  order-service:
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    container_name: order-service
+    ports:
+      - "3006:3006"
+    environment:
+      NODE_ENV: development
+      PORT: 3006
+    depends_on:
+      - postgres-order
+      - redis
+      - kafka
+    networks:
+      - delivery-network
+    volumes:
+      - ./order-service:/app
+      - /app/node_modules
+
+  payment-service:
+    build:
+      context: .
+      dockerfile: ./payment-service/Dockerfile
+    container_name: payment-service
+    ports:
+      - "3007:3007"
+    environment:
+      NODE_ENV: development
+      PORT: 3007
+    depends_on:
+      - postgres-payment
+      - redis
+      - kafka
+    networks:
+      - delivery-network
+    volumes:
+      - ./payment-service:/app
+      - /app/node_modules
+
+  delivery-service:
+    build:
+      context: .
+      dockerfile: ./delivery-service/Dockerfile
+    container_name: delivery-service
+    ports:
+      - "3008:3008"
+    environment:
+      NODE_ENV: development
+      PORT: 3008
+    depends_on:
+      - postgres-delivery
+      - redis
+      - kafka
+    networks:
+      - delivery-network
+    volumes:
+      - ./delivery-service:/app
+      - /app/node_modules
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./notification-service/Dockerfile
+    container_name: notification-service
+    ports:
+      - "3009:3009"
+    environment:
+      NODE_ENV: development
+      PORT: 3009
+    depends_on:
+      - redis
+      - kafka
+    networks:
+      - delivery-network
+    volumes:
+      - ./notification-service:/app
+      - /app/node_modules
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: ./analytics-service/Dockerfile
+    container_name: analytics-service
+    ports:
+      - "3010:3010"
+    environment:
+      NODE_ENV: development
+      PORT: 3010
+    depends_on:
+      - mongodb-analytics
+      - kafka
+    networks:
+      - delivery-network
+    volumes:
+      - ./analytics-service:/app
+      - /app/node_modules
+
+volumes:
+  postgres-auth-data:
+  postgres-user-data:
+  postgres-product-data:
+  postgres-inventory-data:
+  postgres-order-data:
+  postgres-payment-data:
+  postgres-delivery-data:
+  mongodb-analytics-data:
+  redis-data:
+
+networks:
+  delivery-network:
+    driver: bridge
