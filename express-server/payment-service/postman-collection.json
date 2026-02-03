@@ -1,0 +1,88 @@
+{
+  "info": {
+    "name": "Payment Service",
+    "description": "Payment processing service with webhook support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3007",
+      "type": "string"
+    },
+    {
+      "key": "token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Create Payment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "x-user-id", "value": "user-uuid"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"orderId\": \"order-uuid\",\n  \"amount\": 99.99,\n  \"paymentMethod\": \"credit_card\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payments",
+          "host": ["{{baseUrl}}"],
+          "path": ["payments"]
+        }
+      }
+    },
+    {
+      "name": "Get Payment",
+      "request": {
+        "method": "GET",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{token}}"},
+          {"key": "x-user-id", "value": "user-uuid"}
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/payments/:id",
+          "host": ["{{baseUrl}}"],
+          "path": ["payments", ":id"],
+          "variable": [{"key": "id", "value": "payment-uuid"}]
+        }
+      }
+    },
+    {
+      "name": "Stripe Webhook",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "stripe-signature", "value": "webhook-signature"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"type\": \"payment_intent.succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"pi_1234567890\",\n      \"amount\": 9999,\n      \"status\": \"succeeded\"\n    }\n  }\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/payments/webhooks/stripe",
+          "host": ["{{baseUrl}}"],
+          "path": ["payments", "webhooks", "stripe"]
+        }
+      }
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    }
+  ]
+}
