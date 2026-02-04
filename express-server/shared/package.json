@@ -1,0 +1,19 @@
+{
+  "name": "@home-delivery/shared",
+  "version": "1.0.0",
+  "description": "Shared utilities for home delivery microservices",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "dependencies": {
+    "winston": "^3.11.0",
+    "redis": "^4.6.12"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.6",
+    "typescript": "^5.3.3"
+  }
+}
